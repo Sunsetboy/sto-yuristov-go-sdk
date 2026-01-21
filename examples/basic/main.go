@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	stoyuristov "github.com/your-org/sto-yuristov-go-sdk"
+	stoyuristov "github.com/Sunsetboy/sto-yuristov-go-sdk"
 )
 
 func main() {

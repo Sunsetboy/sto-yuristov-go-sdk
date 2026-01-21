@@ -14,6 +14,6 @@ import (
 //	    Directions: []int{10, 20},
 //	})
 func (c *Client) UpdateLead(ctx context.Context, id int, req *LeadUpdateRequest) error {
-	path := fmt.Sprintf("/intapi/lead/update/id/%d", id)
+	path := fmt.Sprintf("/intapi/lead/update/id/%d/", id)
 	return c.do(ctx, "POST", path, req)
 }

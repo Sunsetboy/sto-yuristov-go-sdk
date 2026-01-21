@@ -5,7 +5,7 @@ Go SDK for the 100yuristov internal API.
 ## Installation
 
 ```bash
-go get github.com/your-org/sto-yuristov-go-sdk
+go get github.com/sunsetboy/sto-yuristov-go-sdk
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ import (
     "log"
     "time"
 
-    stoyuristov "github.com/your-org/sto-yuristov-go-sdk"
+    stoyuristov "github.com/sunsetboy/sto-yuristov-go-sdk"
 )
 
 func main() {
@@ -99,8 +99,8 @@ This SDK follows [Semantic Versioning](https://semver.org/).
 
 ```bash
 # Update to latest version
-go get github.com/your-org/sto-yuristov-go-sdk@latest
+go get github.com/sunsetboy/sto-yuristov-go-sdk@latest
 
 # Use specific version
-go get github.com/your-org/sto-yuristov-go-sdk@v1.0.0
+go get github.com/sunsetboy/sto-yuristov-go-sdk@v1.0.0
 ```
