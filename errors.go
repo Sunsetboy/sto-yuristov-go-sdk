@@ -1,6 +1,7 @@
 package stoyuristov
 
 import (
+	"context"
 	"errors"
 	"fmt"
 )
@@ -17,7 +18,21 @@ var (
 
 	// ErrInternalServer is returned when the API returns a 5xx status.
 	ErrInternalServer = errors.New("internal server error")
+
+	// ErrRequestFailed wraps errors of sending the request or reading the
+	// response: connection refused, DNS, timeouts.
+	ErrRequestFailed = errors.New("failed to make request")
 )
+
+// IsRetryable reports whether repeating the same request may succeed:
+// network errors, timeouts and 5xx responses. Other API errors (4xx, 3xx) are
+// permanent, as is the cancellation of the caller's context.
+func IsRetryable(err error) bool {
+	if err == nil || errors.Is(err, context.Canceled) {
+		return false
+	}
+	return errors.Is(err, ErrInternalServer) || errors.Is(err, ErrRequestFailed)
+}
 
 // APIError represents an error response from the API.
 type APIError struct {

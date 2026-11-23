@@ -68,8 +68,25 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
+
+    // Report the result of a web push delivery job
+    logID, gone := 12345, 410
+    err = client.ReportPush(ctx, &stoyuristov.PushReport{
+        MessageID: "4f6c1a52-3b1e-4c8e-9d43-8a7b0c2e1f00",
+        LogID:     &logID, // nil if the application did not write the log record
+        Status:    stoyuristov.PushReportProcessed,
+        Results: []stoyuristov.PushDeliveryResult{
+            {SubscriptionID: 55, EndpointHash: "9b74…", Result: stoyuristov.PushResultDelivered},
+            {SubscriptionID: 56, EndpointHash: "1c2d…", Result: stoyuristov.PushResultExpired, HTTPStatus: &gone},
+        },
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
 }
 ```
+
+The report format is described in the main application, `protected/docs/WEB_PUSH_ASYNC.md`.
 
 ## Error Handling
 
@@ -87,6 +104,13 @@ if errors.Is(err, stoyuristov.ErrNotFound) {
     // Handle other errors
 }
 ```
+
+`IsRetryable(err)` tells whether repeating the request may succeed: network errors,
+timeouts (`ErrRequestFailed`) and 5xx responses (`ErrInternalServer`). 4xx and 3xx
+responses and a cancelled context are permanent.
+
+The client does not follow redirects: all API methods are POST, and a redirected POST
+would be replayed as GET without the body. A 3xx response is returned as `*APIError`.
 
 ## Configuration Options
 

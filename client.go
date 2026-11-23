@@ -35,6 +35,9 @@ func NewClient(baseURL, authToken string, opts ...Option) *Client {
 	c := &Client{
 		httpClient: &http.Client{
 			Timeout: defaultTimeout,
+			// the API is called with POST, and a redirected POST is replayed as
+			// GET without the body: return the 3xx as an *APIError instead
+			CheckRedirect: noRedirects,
 		},
 		baseURL:   baseURL,
 		authToken: authToken,
@@ -45,6 +48,11 @@ func NewClient(baseURL, authToken string, opts ...Option) *Client {
 	}
 
 	return c
+}
+
+// noRedirects makes http.Client return redirect responses as they are.
+func noRedirects(*http.Request, []*http.Request) error {
+	return http.ErrUseLastResponse
 }
 
 // do performs an HTTP request with the given method, path, and body.
@@ -69,7 +77,7 @@ func (c *Client) do(ctx context.Context, method, path string, body any) error {
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to make request: %w", err)
+		return fmt.Errorf("%w: %w", ErrRequestFailed, err)
 	}
 	defer resp.Body.Close()
 
@@ -103,7 +111,7 @@ func (c *Client) doWithResponse(ctx context.Context, method, path string, body, 
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to make request: %w", err)
+		return fmt.Errorf("%w: %w", ErrRequestFailed, err)
 	}
 	defer resp.Body.Close()
 
