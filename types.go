@@ -28,3 +28,46 @@ type SentimentUpdateRequest struct {
 func String(s string) *string {
 	return &s
 }
+
+// Statuses of a PushReport.
+const (
+	// PushReportProcessed means the pushes were sent; Results holds the outcomes.
+	PushReportProcessed = "processed"
+	// PushReportExpired means the job was received after its expiry time and
+	// nothing was sent; Results is empty.
+	PushReportExpired = "expired"
+)
+
+// Outcomes of sending a push to one subscription (PushDeliveryResult.Result).
+const (
+	// PushResultDelivered means the push service accepted the notification (2xx).
+	PushResultDelivered = "delivered"
+	// PushResultExpired means the subscription no longer exists (404/410).
+	PushResultExpired = "expired"
+	// PushResultFailed means any other error: another HTTP status, a timeout,
+	// an encryption error.
+	PushResultFailed = "failed"
+)
+
+// PushReport is the result of a web push delivery job.
+type PushReport struct {
+	MessageID string `json:"message_id"`
+	// LogID is nil when the main application could not write the push log record.
+	LogID *int `json:"log_id"`
+	// Status is PushReportProcessed or PushReportExpired.
+	Status  string               `json:"status"`
+	Results []PushDeliveryResult `json:"results"`
+}
+
+// PushDeliveryResult is the outcome of sending a push to one subscription.
+type PushDeliveryResult struct {
+	SubscriptionID int    `json:"subscription_id"`
+	EndpointHash   string `json:"endpoint_hash"`
+	// Result is PushResultDelivered, PushResultExpired or PushResultFailed.
+	Result string `json:"result"`
+	// HTTPStatus is the push service's response status, nil for network and
+	// encryption errors.
+	HTTPStatus *int `json:"http_status"`
+	// Reason describes a failure, at most 500 characters are stored.
+	Reason string `json:"reason,omitempty"`
+}
